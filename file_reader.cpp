@@ -1,5 +1,10 @@
 #include<bits/stdc++.h>
 
+// Note: Singleton won't work if we need to parse two files. 
+// Solution: Create a file reader instance in parser and 
+// send this instance to node.
+// Left -- Implement if needed.
+
 class FileReader{
     // Singleton
 public:

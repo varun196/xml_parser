@@ -3,9 +3,8 @@
 #include<memory>
 
 class Node : public std::enable_shared_from_this<Node>{
-private:
-    using callback_type = std::function<void(std::string path, std::string name, std::shared_ptr<Node> node)>;    
-
+private:    
+    using callback_type = std::function<void(std::string path, std::string name, std::shared_ptr<Node> node)>;
 public:
     Node(callback_type callback = NULL, std::string path = "");
     void set_callback(std::function<void(std::string path, std::string name, std::shared_ptr<Node> node)> callback);
@@ -15,7 +14,6 @@ public:
 
 private:
     std::ifstream& _reader;
-    //static std::ifstream _s_xml_file;
     static std::stack<std::string> _s_xml_stack;
 
     std::string _name;

@@ -1,12 +1,10 @@
 #include "node.h"
 #include <boost/algorithm/string/replace.hpp>
 
-// TODO: handle path
 // TODO: take care of comments and CDATA
 // TODO: close file  myfile.close();
 // TODO: handle exceptions
 // TODO: Send callbacks on separate thread
-// TODO: implement singleton pattern for _reader
 
 Node::Node(callback_type callback, std::string path): 
 _callback(callback), 

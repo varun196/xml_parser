@@ -3,12 +3,15 @@
 // TODO: hold filereader
 
 class XMLParser{
+    using callback_type = std::function<void(std::string path, std::string name, std::shared_ptr<Node> node)>;
+
 public:
-    XMLParser(std::string input_file);
+    XMLParser(std::string input_file, callback_type callback);
     void beginParsing();
+    void set_callback(callback_type);
 
 private:
-    std::stack<std::string> xml_stack;
-    std::ifstream xml_file;
-
+    callback_type _callback;
+    FileReader& _fileReaderReference;
+    std::ifstream& _reader;
 };
