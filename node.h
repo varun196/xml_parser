@@ -12,7 +12,9 @@ public:
 
     void begin_parsing();
     void begin_parsing(std::string& node);
-
+    std::string& get_value(){
+        return _text_value;
+    }
 private:
     std::ifstream& _reader;
     static std::stack<std::string> _s_xml_stack;

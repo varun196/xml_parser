@@ -34,7 +34,12 @@ void Node::begin_parsing(){
 
 void Node::parse_value(std::string& str, std::size_t start_from){
     std::size_t next_tag_start = start_from;
-    if(str[start_from] == '<' && start_from+1 <str.length() && str[start_from+1] != '!')  return;
+    if(str[start_from] == '<' && start_from+1 <str.length() && str[start_from+1] != '!'){
+        if(str[start_from] == '<' && start_from+1 <str.length() && str[start_from+1] == '/'){
+            parse_end_tag(str,start_from);
+        }
+        return;
+    }
     
     // Find start of end tag or cdata or newtag
     while(next_tag_start < str.length() && str[next_tag_start] != '<'){
@@ -124,6 +129,10 @@ int Node::extract_properties(std::string& str){
 
     if(str[1] == '!'){
         return handle_cdata(str, 0);
+    }
+
+    if(str[1] == '?'){
+        str = get_next_line();
     }
 
     int i = 0;

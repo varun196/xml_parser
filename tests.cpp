@@ -15,7 +15,7 @@ void TestNodeViaXML(){
 }
 
 void foo(std::string path, std::string name, std::shared_ptr<Node> node){
-    std::cout<<path<<" "<<name<<std::endl;
+    std::cout<<path<<" "<<name<<" "<<node->get_value()<<std::endl;
 }
 
 void CallbackTest(){
@@ -30,6 +30,7 @@ void CallbackTest(){
 }
 
 void XMLParserTest(){
+    //XMLParser parser("standard.xml", foo);
     XMLParser parser("test.xml", foo);
     parser.beginParsing();
 }
