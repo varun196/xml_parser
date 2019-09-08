@@ -8,21 +8,20 @@
 // TODO: Send callbacks on separate thread
 // TODO: implement singleton pattern for _s_xml_file
 
-Node::Node(){
+Node::Node(std::function<void(std::string path, std::string name, std::shared_ptr<Node> node)> callback): _callback(callback) {}
+
+void Node::begin_parsing(){
     if (_s_xml_file.is_open()){
         std::string line;
         std::getline(_s_xml_file, line);
-        begin(line);   
+        begin_parsing(line);   
     }else{
         throw "File not open";
     }
 }
 
-Node::Node(std::string& node){
-    begin(node);
-}
-
-void Node::begin(std::string& node){
+void Node::begin_parsing(std::string& node){
+    remove_initial_whitespaces(node);
     std::size_t tag_end = extract_properties(node);
     if(_search_for_closing_tag){
         _s_xml_stack.push(_name);
@@ -33,7 +32,8 @@ void Node::begin(std::string& node){
             remove_initial_whitespaces(line);
             parse_end_tag(line);
             if(!_tag_complete){
-                std::shared_ptr<Node> ip_node= std::make_shared<Node>(line);
+                std::shared_ptr<Node> ip_node= std::make_shared<Node>(_callback);
+                ip_node->begin_parsing(line);
                 _child_nodes.emplace_back(ip_node);
             }
         }
@@ -125,9 +125,9 @@ bool Node::parse_end_tag(const std::string& str, std::size_t tag_begin /*=0*/){
                         _tag_complete = true;
                     }   
                     _s_xml_stack.pop();
-                    if(_callback){
+                    if(_callback != NULL){
                         std::string path;
-                        //_callback(path,_name,shared_from_this());
+                        _callback(path,_name,shared_from_this());
                     }
                 }else{
                     throw "Invalid XML";
@@ -158,42 +158,3 @@ void Node::remove_initial_whitespaces(std::string& str){
     while(i < str.length() && isspace(str[i])) i++;
     str = str.substr(i);
 }
-
-// void Node::extract_properties(std::string& str){
-//     if(str[0] != '<')
-//         return;
-
-//     std::size_t space_pos = str.find(' '); // TODO: Remove extra spaces
-//     name = str.substr(1,space_pos-1);  // Extract name
-
-//     // Extract Attributes
-//     std::size_t node_end_pos = str.rfind('>');
-//     if(str[node_end_pos-1] == '/')
-//         search_for_closing_tag = false;
-
-//     std::size_t eq_pos;
-//     std::string val;
-
-//     auto extract_value = [&](std::size_t start_pos) -> std::string{
-//         // TODO: remove spaces at start
-//         std::size_t val_end = str.find(str[start_pos],start_pos+1);
-//         std::string val(str.substr(start_pos+1,val_end - start_pos -1));
-//         replace_xml_escapes(val);
-//         space_pos = val_end+1;
-//         return val;
-//     };
-
-//     auto extract_key = [&]()-> std::string{
-//         // TODO: Remove spaces at start
-//         return str.substr(space_pos+1,eq_pos - space_pos - 1);
-//     };
-
-//     while(space_pos < node_end_pos){
-//         eq_pos = str.find('=',space_pos);      
-//         if(eq_pos == str.npos){
-//             break;
-//         }
-//         std::string key = extract_key();
-//         attributes.emplace(key, extract_value(eq_pos+1));
-//     }
-// }

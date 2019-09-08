@@ -1,16 +1,15 @@
 #include<bits/stdc++.h>
 #include<memory>
 
-class Node{
+class Node : public std::enable_shared_from_this<Node>{
 public:
-    Node();
-    Node(std::string& node);
+    Node(std::function<void(std::string path, std::string name, std::shared_ptr<Node> node)> callback = NULL);
     void print(){} // TODO: delete
 
-    void set_callback(std::function<void(std::string& path, std::string& name, std::shared_ptr<Node> node)> callback){
-        _callback = callback;
-    }
+    void set_callback(std::function<void(std::string path, std::string name, std::shared_ptr<Node> node)> callback);
 
+    void begin_parsing();
+    void begin_parsing(std::string& node);
 
 private:
     static std::ifstream _s_xml_file;
@@ -23,10 +22,11 @@ private:
 
     bool _search_for_closing_tag = true;
     bool _tag_complete = false;
-    std::function<void(std::string& path, std::string& name, std::shared_ptr<Node> node)> _callback;
+    std::function<void(std::string path, std::string name, std::shared_ptr<Node> node)> _callback = NULL;
+
+    std::shared_ptr<Node> self_shared_ptr;
 
 private:
-    void begin(std::string& node);
 
     int extract_properties(std::string& str);
     int extract_attributes(std::string& str, int i);
