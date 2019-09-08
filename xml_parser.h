@@ -1,5 +1,7 @@
 #include<bits/stdc++.h>
 
+// TODO: hold filereader
+
 class XMLParser{
 public:
     XMLParser(std::string input_file);

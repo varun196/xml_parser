@@ -2,8 +2,6 @@
 #include <gtest/gtest.h>
 
 std::stack<std::string> Node::_s_xml_stack;
-std::ifstream Node::_s_xml_file("test.xml");
-
 
 void TestNodeViaXML(){
     Node n;
@@ -29,6 +27,7 @@ void CallbackTest(){
 }
 
 int main(){
-    TestNodeViaXML();
+    FileReader::get_instance("test.xml");
+    //TestNodeViaXML();
     CallbackTest();
 }

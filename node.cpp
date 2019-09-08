@@ -6,15 +6,18 @@
 // TODO: close file  myfile.close();
 // TODO: handle exceptions
 // TODO: Send callbacks on separate thread
-// TODO: implement singleton pattern for _s_xml_file
+// TODO: implement singleton pattern for _reader
 
-Node::Node(callback_type callback, std::string path): _callback(callback), _path(path) 
+Node::Node(callback_type callback, std::string path): 
+_callback(callback), 
+_path(path),
+_reader(FileReader::get_instance().get_reader())
 {}
 
 void Node::begin_parsing(){
-    if (_s_xml_file.is_open()){
+    if (_reader.is_open()){
         std::string line;
-        std::getline(_s_xml_file, line);
+        std::getline(_reader, line);
         begin_parsing(line);   
     }else{
         throw "File not open";
@@ -29,7 +32,7 @@ void Node::begin_parsing(std::string& node){
         tag_end = handle_tag_end_in_same_line(node, tag_end);
         std::string line;
         while(!_tag_complete){
-            std::getline(_s_xml_file, line);
+            std::getline(_reader, line);
             remove_initial_whitespaces(line);
             parse_end_tag(line);
             if(!_tag_complete){

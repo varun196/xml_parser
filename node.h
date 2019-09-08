@@ -1,4 +1,5 @@
 #include<bits/stdc++.h>
+#include "file_reader.cpp"
 #include<memory>
 
 class Node : public std::enable_shared_from_this<Node>{
@@ -13,7 +14,8 @@ public:
     void begin_parsing(std::string& node);
 
 private:
-    static std::ifstream _s_xml_file;
+    std::ifstream& _reader;
+    //static std::ifstream _s_xml_file;
     static std::stack<std::string> _s_xml_stack;
 
     std::string _name;
