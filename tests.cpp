@@ -19,6 +19,8 @@ void TestNode(){
 void TestNodeViaXML(){
     Node n;
     Node k;
+    Node j;
+    j.print();
 }
 
 int main(){

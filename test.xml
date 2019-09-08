@@ -5,3 +5,21 @@
         <price> 1500 </price>
     </order>
 </nested_node>
+<composite_nested_node>
+    <nested_node>
+        <order id = "500">
+            <amount> 5 </amount>
+            <price> 1500 </price>
+        </order>
+        <order id = "500">
+            <amount> 5 </amount>
+            <price> 1500 </price>
+        </order>
+    </nested_node>
+    <nested_node>
+        <order id = "500">
+            <amount> 5 </amount>
+            <price> 1500 </price>
+        </order>
+    </nested_node>
+</composite_nested_node>

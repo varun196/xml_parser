@@ -4,6 +4,9 @@
 // TODO: handle path
 // TODO: take care of comments and CDATA
 // TODO: close file  myfile.close();
+// TODO: handle exceptions
+// TODO: Send callbacks on separate thread
+// TODO: implement singleton pattern for _s_xml_file
 
 Node::Node(){
     if (_s_xml_file.is_open()){
@@ -105,6 +108,7 @@ int Node::handle_tag_end_in_same_line(const std::string& node, std::size_t tag_e
             throw "Next tag starting in same line is not handled ";
         }
     } 
+    return -1;  // TODO: return if two tags in same lines are handled
 }
 
 bool Node::parse_end_tag(const std::string& str, std::size_t tag_begin /*=0*/){

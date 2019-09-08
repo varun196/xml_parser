@@ -5,7 +5,7 @@ class Node{
 public:
     Node();
     Node(std::string& node);
-    void print(){}
+    void print(){} // TODO: delete
 private:
     static std::ifstream _s_xml_file;
     static std::stack<std::string> _s_xml_stack;
@@ -14,7 +14,7 @@ private:
     std::string _name;
     std::string _text_value;
     std::unordered_map<std::string, std::string> _attributes;
-    std::vector<Node> _child_nodes;
+    std::vector<std::shared_ptr<Node>> _child_nodes;
     bool _search_for_closing_tag = true;
     bool _tag_complete = false;
 
@@ -30,4 +30,6 @@ private:
 
     void replace_xml_escapes(std::string& str);
     void remove_initial_whitespaces(std::string& str);
+
+    //std::function<void(std::string& path, std::string& name, )>
 };
