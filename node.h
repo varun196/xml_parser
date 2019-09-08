@@ -47,6 +47,6 @@ private:
     std::string get_next_line();
     inline void remove_initial_whitespaces(std::string& str);
     void ignore_comments(std::string& str);
-    int handle_cdata(std::string& str, std::size_t cdata_begin);
+    int handle_cdata(std::string& str, long cdata_begin);
     
 };

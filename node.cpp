@@ -34,7 +34,7 @@ void Node::begin_parsing(){
 
 void Node::parse_value(std::string& str, std::size_t start_from){
     std::size_t next_tag_start = start_from;
-    if(str[start_from] == '<')  return;
+    if(str[start_from] == '<' && start_from+1 <str.length() && str[start_from+1] != '!')  return;
     
     // Find start of end tag or cdata or newtag
     while(next_tag_start < str.length() && str[next_tag_start] != '<'){
@@ -70,7 +70,7 @@ void Node::parse_value(std::string& str, std::size_t start_from){
 
 }
 
-int Node::handle_cdata(std::string& str, std::size_t cdata_begin){
+int Node::handle_cdata(std::string& str, long cdata_begin){
     // Verify this is cdata
     if(str.substr(cdata_begin, _cdata_beg_str.length()) != _cdata_beg_str) return -1;
 
@@ -78,7 +78,7 @@ int Node::handle_cdata(std::string& str, std::size_t cdata_begin){
     while(end_cdata == str.npos){
         _text_value.append(str.substr(cdata_begin +_cdata_beg_str.length()));
         str = get_next_line();
-        cdata_begin = -_cdata_beg_str.length();
+        cdata_begin = -1 * _cdata_beg_str.length();
         end_cdata =str.find(_cdata_end_str);
     }
     _text_value.append(str.substr(cdata_begin +_cdata_beg_str.length(), end_cdata - cdata_begin - _cdata_beg_str.length()));
@@ -96,7 +96,7 @@ void Node::begin_parsing(std::string& node){
             line = get_next_line();
             parse_end_tag(line);
             if(!_tag_complete){
-                if(line[0] == '<'){ // if this is a tag
+                if(line[0] == '<' && line[1] != '!'){ // if this is a tag
                     std::shared_ptr<Node> ip_node= std::make_shared<Node>(_callback, _path);
                     ip_node->begin_parsing(line);
                     _child_nodes.emplace_back(ip_node);
