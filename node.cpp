@@ -33,7 +33,8 @@ void Node::begin(std::string& node){
             remove_initial_whitespaces(line);
             parse_end_tag(line);
             if(!_tag_complete){
-                _child_nodes.emplace_back(line);
+                std::shared_ptr<Node> ip_node= std::make_shared<Node>(line);
+                _child_nodes.emplace_back(ip_node);
             }
         }
     }
@@ -124,6 +125,10 @@ bool Node::parse_end_tag(const std::string& str, std::size_t tag_begin /*=0*/){
                         _tag_complete = true;
                     }   
                     _s_xml_stack.pop();
+                    if(_callback){
+                        std::string path;
+                        //_callback(path,_name,shared_from_this());
+                    }
                 }else{
                     throw "Invalid XML";
                 }
