@@ -12,7 +12,7 @@ void TestNodeViaXML(){
     k.begin_parsing();
     Node j;
     j.begin_parsing();
-    j.print();
+    //j.print();
 }
 
 void foo(std::string path, std::string name, std::shared_ptr<Node> node){
@@ -29,7 +29,6 @@ void CallbackTest(){
 }
 
 int main(){
-    //TestNode();
-    //TestNodeViaXML();
+    TestNodeViaXML();
     CallbackTest();
 }

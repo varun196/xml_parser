@@ -8,7 +8,8 @@
 // TODO: Send callbacks on separate thread
 // TODO: implement singleton pattern for _s_xml_file
 
-Node::Node(std::function<void(std::string path, std::string name, std::shared_ptr<Node> node)> callback): _callback(callback) {}
+Node::Node(callback_type callback, std::string path): _callback(callback), _path(path) 
+{}
 
 void Node::begin_parsing(){
     if (_s_xml_file.is_open()){
@@ -32,7 +33,7 @@ void Node::begin_parsing(std::string& node){
             remove_initial_whitespaces(line);
             parse_end_tag(line);
             if(!_tag_complete){
-                std::shared_ptr<Node> ip_node= std::make_shared<Node>(_callback);
+                std::shared_ptr<Node> ip_node= std::make_shared<Node>(_callback, _path);
                 ip_node->begin_parsing(line);
                 _child_nodes.emplace_back(ip_node);
             }
@@ -48,6 +49,8 @@ int Node::extract_properties(std::string& str){
     int i = 0;
     while(is_valid_tag_char(str[++i]));
     _name = str.substr(1,i-1);
+    if(_path != "") _path += "/";
+    _path += _name;
 
     while(isspace(str[i]))  i++;
 
@@ -126,8 +129,7 @@ bool Node::parse_end_tag(const std::string& str, std::size_t tag_begin /*=0*/){
                     }   
                     _s_xml_stack.pop();
                     if(_callback != NULL){
-                        std::string path;
-                        _callback(path,_name,shared_from_this());
+                        _callback(_path,_name,shared_from_this());
                     }
                 }else{
                     throw "Invalid XML";

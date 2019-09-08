@@ -2,10 +2,11 @@
 #include<memory>
 
 class Node : public std::enable_shared_from_this<Node>{
-public:
-    Node(std::function<void(std::string path, std::string name, std::shared_ptr<Node> node)> callback = NULL);
-    void print(){} // TODO: delete
+private:
+    using callback_type = std::function<void(std::string path, std::string name, std::shared_ptr<Node> node)>;    
 
+public:
+    Node(callback_type callback = NULL, std::string path = "");
     void set_callback(std::function<void(std::string path, std::string name, std::shared_ptr<Node> node)> callback);
 
     void begin_parsing();
@@ -16,13 +17,15 @@ private:
     static std::stack<std::string> _s_xml_stack;
 
     std::string _name;
+    std::string _path;
     std::string _text_value;
     std::unordered_map<std::string, std::string> _attributes;
     std::vector<std::shared_ptr<Node>> _child_nodes;
 
     bool _search_for_closing_tag = true;
     bool _tag_complete = false;
-    std::function<void(std::string path, std::string name, std::shared_ptr<Node> node)> _callback = NULL;
+
+    callback_type _callback = NULL;
 
     std::shared_ptr<Node> self_shared_ptr;
 
