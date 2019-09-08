@@ -15,7 +15,7 @@ void TestNodeViaXML(){
 }
 
 void foo(std::string path, std::string name, std::shared_ptr<Node> node){
-    std::cout<<name<<std::endl;
+    std::cout<<path<<" "<<name<<std::endl;
 }
 
 void CallbackTest(){

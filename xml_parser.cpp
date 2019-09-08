@@ -8,9 +8,15 @@ XMLParser::XMLParser(std::string input_file, callback_type callback):
 {}
 
 void XMLParser::beginParsing(){
-    while(_reader.peek() != std::ifstream::traits_type::eof()){
-        std::shared_ptr<Node> n= std::make_shared<Node>(_callback);
-        n->begin_parsing();
-        n = nullptr;
+    try{
+        while(_reader.peek() != std::ifstream::traits_type::eof()){
+            std::shared_ptr<Node> n= std::make_shared<Node>(_callback);
+            n->begin_parsing();
+            n = nullptr;
+        }
+    }catch(const std::exception& e){
+        std::cout<<e.what();
+    }catch(const std::string& e){
+        std::cout<<e;
     }
 }

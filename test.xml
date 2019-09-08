@@ -1,25 +1,35 @@
 <text> this is a plain text </text>
+<text> 
+    this is a plain text 
+</text>
+<text> 
+    this is two lined plain text
+    this is second line
+</text>
 <nested_node>
-    <order id = "500">
+    <order id = "1">
         <amount> 5 </amount>
         <price> 1500 </price>
     </order>
 </nested_node>
 <composite_nested_node>
     <nested_node>
-        <order id = "500">
+        <order id = "2">
             <amount> 5 </amount>
             <price> 1500 </price>
         </order>
-        <order id = "500">
+        <order id = "3">
             <amount> 5 </amount>
             <price> 1500 </price>
         </order>
     </nested_node>
     <nested_node>
-        <order id = "500">
+        <order id = "4">
             <amount> 5 </amount>
             <price> 1500 </price>
         </order>
     </nested_node>
 </composite_nested_node>
+<comment_test>
+    <!-- A comment <Should_not_display> </Should_not_display>--><text> Was comment ignored? </text>
+</comment_test>

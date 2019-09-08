@@ -5,6 +5,7 @@
 class Node : public std::enable_shared_from_this<Node>{
 private:    
     using callback_type = std::function<void(std::string path, std::string name, std::shared_ptr<Node> node)>;
+
 public:
     Node(callback_type callback = NULL, std::string path = "");
     void set_callback(std::function<void(std::string path, std::string name, std::shared_ptr<Node> node)> callback);
@@ -26,20 +27,27 @@ private:
     bool _tag_complete = false;
 
     callback_type _callback = NULL;
-
-    std::shared_ptr<Node> self_shared_ptr;
-
+        
+    const std::string _cdata_beg_str = "<![CDATA[";
+    const std::string _cdata_end_str = "]]>";
 private:
 
-    int extract_properties(std::string& str);
-    int extract_attributes(std::string& str, int i);
+    int extract_properties(std::string& str); // Extracts name and attributes
+    int extract_attributes(std::string& str, int i); // Extracts attributes
 
     int handle_tag_end_in_same_line(const std::string& node, std::size_t tag_end);
-    bool parse_end_tag(const std::string& str, std::size_t pos = 0);
-    bool is_valid_tag_char(const char& c);
 
-    void replace_xml_escapes(std::string& str);
-    void remove_initial_whitespaces(std::string& str);
+    bool parse_end_tag(const std::string& str, std::size_t pos = 0); // Verifies tag end and checks if xml was valid.
 
+    inline bool is_valid_tag_name_char(const char& c); // Check if char is valid char for tag name
+
+    inline void replace_xml_escapes(std::string& str); // Replace escape escapes to original chars
+
+    void parse_value(std::string& str, std::size_t start_from);
+
+    std::string get_next_line();
+    inline void remove_initial_whitespaces(std::string& str);
+    void ignore_comments(std::string& str);
+    int handle_cdata(std::string& str, std::size_t cdata_begin);
     
 };
