@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 
 std::stack<std::string> Node::_s_xml_stack;
+std::ifstream Node::_s_xml_file("test.xml");
 
 void TestNode(){
     std::string s;
@@ -15,6 +16,12 @@ void TestNode(){
     Node n4(s);
 }
 
+void TestNodeViaXML(){
+    Node n;
+    Node k;
+}
+
 int main(){
-    TestNode();
+    //TestNode();
+    TestNodeViaXML();
 }

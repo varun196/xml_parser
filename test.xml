@@ -1,2 +1,7 @@
-hi
-there
+<text> this is a plain text </text>
+<nested_node>
+    <order id = "500">
+        <amount> 5 </amount>
+        <price> 1500 </price>
+    </order>
+</nested_node>

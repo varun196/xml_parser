@@ -1,54 +1,40 @@
 #include "node.h"
 #include <boost/algorithm/string/replace.hpp>
 
+// TODO: handle path
+// TODO: take care of comments and CDATA
+// TODO: close file  myfile.close();
+
 Node::Node(){
-    // std::string line;
-    // std::getline(_s_xml_file, line);
-    // begin(line);   
+    if (_s_xml_file.is_open()){
+        std::string line;
+        std::getline(_s_xml_file, line);
+        begin(line);   
+    }else{
+        throw "File not open";
+    }
 }
 
 Node::Node(std::string& node){
     begin(node);
 }
 
-// TODO: take care of comments and CDATA
-
 void Node::begin(std::string& node){
     std::size_t tag_end = extract_properties(node);
-
     if(_search_for_closing_tag){
         _s_xml_stack.push(_name);
-
-        std::size_t next_tag_start = tag_end;
-        while(next_tag_start < node.length() && isspace(node[next_tag_start]))  next_tag_start++;
-        
-        while(next_tag_start < node.length() && node[next_tag_start] != '<'){
-            if(node[next_tag_start] == '"' || node[next_tag_start] == '\'' ){ 
-                // Skip "" or ''
-                next_tag_start = node.find(node[next_tag_start], next_tag_start+1);
-                if(next_tag_start == node.npos){
-                    throw "Error";
-                }
-            }
-            next_tag_start++;
-        }
-
-        if(next_tag_start < node.length() && node[next_tag_start] == '<'){
-            if(next_tag_start+1 < node.length() && node[next_tag_start+1] == '/'){
-                if(parse_end_tag(node, next_tag_start)){
-                    _text_value = node.substr(tag_end+1, next_tag_start - tag_end-1);
-                }
-            }else if(next_tag_start+1 < node.length() && node[next_tag_start+1] == '!'){
-                // Handle comment and CDATA
-            }else{
-                throw "Next tag starting in same line is not handled ";
+        tag_end = handle_tag_end_in_same_line(node, tag_end);
+        std::string line;
+        while(!_tag_complete){
+            std::getline(_s_xml_file, line);
+            remove_initial_whitespaces(line);
+            parse_end_tag(line);
+            if(!_tag_complete){
+                _child_nodes.emplace_back(line);
             }
         }
-
-            
     }
 }
-
 
 int Node::extract_properties(std::string& str){
     if(str[0] != '<'){
@@ -93,7 +79,35 @@ int Node::extract_attributes(std::string& str, int key_start){
     return extract_attributes(str, next_key_start);
 }
 
-bool Node::parse_end_tag(std::string& str, std::size_t tag_begin){
+int Node::handle_tag_end_in_same_line(const std::string& node, std::size_t tag_end){
+    std::size_t next_tag_start = tag_end;
+    while(next_tag_start < node.length() && isspace(node[next_tag_start]))  next_tag_start++;
+    
+    while(next_tag_start < node.length() && node[next_tag_start] != '<'){
+        if(node[next_tag_start] == '"' || node[next_tag_start] == '\'' ){ 
+            // Skip "" or ''
+            next_tag_start = node.find(node[next_tag_start], next_tag_start+1);
+            if(next_tag_start == node.npos){
+                throw "Error";
+            }
+        }
+        next_tag_start++;
+    }
+
+    if(next_tag_start < node.length() && node[next_tag_start] == '<'){
+        if(next_tag_start+1 < node.length() && node[next_tag_start+1] == '/'){
+            if(parse_end_tag(node, next_tag_start)){
+                _text_value = node.substr(tag_end+1, next_tag_start - tag_end-1);
+            }
+        }else if(next_tag_start+1 < node.length() && node[next_tag_start+1] == '!'){
+            // Handle comment and CDATA
+        }else{
+            throw "Next tag starting in same line is not handled ";
+        }
+    } 
+}
+
+bool Node::parse_end_tag(const std::string& str, std::size_t tag_begin /*=0*/){
     if(tag_begin+1 < str.length()){
         if(str[tag_begin] == '<' && str[tag_begin+1] == '/'){
             tag_begin += 2;
@@ -101,10 +115,13 @@ bool Node::parse_end_tag(std::string& str, std::size_t tag_begin){
             while(is_valid_tag_char(str[tag_end])) tag_end++;
             if(str[tag_end] == '>'){
                 std::string tag_name = str.substr(tag_begin,tag_end - tag_begin);
-                if(tag_name != _s_xml_stack.top()){
-                    throw "Invalid XML";
-                }else{
+                if(tag_name == _s_xml_stack.top()){
+                    if(_s_xml_stack.top() == _name){
+                        _tag_complete = true;
+                    }   
                     _s_xml_stack.pop();
+                }else{
+                    throw "Invalid XML";
                 }
             }else{
                 throw "Invalid XML";
@@ -114,7 +131,7 @@ bool Node::parse_end_tag(std::string& str, std::size_t tag_begin){
     return true;
 }
 
-bool Node::is_valid_tag_char(char& c){
+bool Node::is_valid_tag_char(const char& c){
     return (isalnum(c) || c == '-' || c == '_' || c == '.');
 }
 
@@ -125,6 +142,13 @@ void Node::replace_xml_escapes(std::string& val){
     boost::replace_all(val,"&gt;",">");
     boost::replace_all(val,"&amp;","&");
 };
+
+
+void Node::remove_initial_whitespaces(std::string& str){
+    int i=0;
+    while(i < str.length() && isspace(str[i])) i++;
+    str = str.substr(i);
+}
 
 // void Node::extract_properties(std::string& str){
 //     if(str[0] != '<')
