@@ -58,9 +58,8 @@ void Node::parse_value(std::string& str, std::size_t start_from){
 
     // if this is end tag
     if(next_tag_start+1 < str.length() && str[next_tag_start+1] == '/'){
-        if(parse_end_tag(str, next_tag_start)){
-            _text_value = str.substr(start_from, next_tag_start - start_from);
-        }
+        _text_value = str.substr(start_from, next_tag_start - start_from);
+        parse_end_tag(str, next_tag_start);
     }else if(next_tag_start+1 < str.length() && str[next_tag_start+1] == '!'){
         handle_cdata(str, next_tag_start);
     }else{
@@ -92,7 +91,6 @@ void Node::begin_parsing(std::string& node){
     if(_search_for_closing_tag){
         _s_xml_stack.push(_name);
         parse_value(node, tag_end+1);
-        //tag_end = handle_tag_end_in_same_line(node, tag_end);
         std::string line;
         while(!_tag_complete){
             line = get_next_line();
@@ -166,35 +164,6 @@ int Node::extract_attributes(std::string& str, int key_start){
     while(isspace(str[next_key_start]))  next_key_start++;
 
     return extract_attributes(str, next_key_start);
-}
-
-int Node::handle_tag_end_in_same_line(const std::string& node, std::size_t prev_tag_end){
-    std::size_t next_tag_start = prev_tag_end;
-    while(next_tag_start < node.length() && isspace(node[next_tag_start]))  next_tag_start++;
-    
-    while(next_tag_start < node.length() && node[next_tag_start] != '<'){
-        if(node[next_tag_start] == '"' || node[next_tag_start] == '\'' ){ 
-            // Skip "" or ''
-            next_tag_start = node.find(node[next_tag_start], next_tag_start+1);
-            if(next_tag_start == node.npos){
-                throw "Error -";
-            }
-        }
-        next_tag_start++;
-    }
-
-    if(next_tag_start < node.length() && node[next_tag_start] == '<'){
-        if(next_tag_start+1 < node.length() && node[next_tag_start+1] == '/'){
-            if(parse_end_tag(node, next_tag_start)){
-                _text_value = node.substr(prev_tag_end+1, next_tag_start - prev_tag_end-1);
-            }
-        }else if(next_tag_start+1 < node.length() && node[next_tag_start+1] == '!'){
-            // Handle comment and CDATA
-        }else{
-            throw "Next tag starting in same line is not handled ";
-        }
-    } 
-    return -1;  // TODO: return if two tags in same lines are handled
 }
 
 bool Node::parse_end_tag(const std::string& str, std::size_t tag_begin /*=0*/){

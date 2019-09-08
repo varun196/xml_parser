@@ -35,7 +35,6 @@ private:
     int extract_properties(std::string& str); // Extracts name and attributes
     int extract_attributes(std::string& str, int i); // Extracts attributes
 
-    int handle_tag_end_in_same_line(const std::string& node, std::size_t tag_end);
 
     bool parse_end_tag(const std::string& str, std::size_t pos = 0); // Verifies tag end and checks if xml was valid.
 
