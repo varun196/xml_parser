@@ -2,10 +2,10 @@
 
 int main(){
     std::string file_name;
-    std::cout<<"Enter relative / absolute file name:";
+    std::cout<<"Enter relative / absolute file name:\n";
     std::cin>>file_name;
-    //file_name = "driver_test.xml";
-
+    //std::cout<<std::endl<<file_name;
+    //return 0;
     bool print_id = false;
     auto callback = [&](std::string path, std::string name, std::shared_ptr<Node> node){
         if(name == "amount"){

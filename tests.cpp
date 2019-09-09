@@ -18,7 +18,7 @@ void foo(std::string path, std::string name, std::shared_ptr<Node> node){
 }
 
 void CallbackTest(){
-    FileReader::get_instance("test.xml");
+    FileReader::get_instance("data/test.xml");
     // EXCLUSIVE to TestNodeViaXML test.
     std::shared_ptr<Node> n= std::make_shared<Node>(foo);
     n->begin_parsing();
@@ -29,7 +29,7 @@ void CallbackTest(){
 }
 
 void XMLParserTest(){
-    XMLParser parser("standard.xml", foo);
+    XMLParser parser("data/standard.xml", foo);
     //XMLParser parser("test.xml", foo);
     parser.beginParsing();
 }

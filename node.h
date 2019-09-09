@@ -8,33 +8,24 @@ private:
 
 public:
     Node(callback_type callback = NULL, std::string path = "");
-    void set_callback(std::function<void(std::string path, std::string name, std::shared_ptr<Node> node)> callback);
-
+    
     void begin_parsing();
     void begin_parsing(std::string& node);
-    std::string& get_value(){
-        return _text_value;
-    }
 
-    std::string& get_attribute(std::string key){
-        auto itr = _attributes.find(key);
-        if(itr != _attributes.end()){
-            return itr->second;
-        }else{
-            throw "Error: No such key: key " + key +" node name: "+_name + " path:"+ _path;
-        }
-    }
+    //Getters
+    std::string& get_value();
+    std::string& get_attribute(std::string key);
 
 
 private:
     std::ifstream& _reader;
     static std::stack<std::string> _s_xml_stack;
 
-    std::string _name;
-    std::string _path;
-    std::string _text_value;
-    std::unordered_map<std::string, std::string> _attributes;
-    std::vector<std::shared_ptr<Node>> _child_nodes;
+    std::string _name; // Node's name
+    std::string _path; // Current path
+    std::string _text_value; // Current node's value
+    std::unordered_map<std::string, std::string> _attributes; // Node Attributes
+    std::vector<std::shared_ptr<Node>> _child_nodes; // Pointer to child nodes
 
     bool _search_for_closing_tag = true;
     bool _tag_complete = false;
@@ -58,7 +49,7 @@ private:
 
     void parse_value(std::string& str, std::size_t start_from);
 
-    std::string get_next_line();
+    inline std::string get_next_line();
     inline void remove_initial_whitespaces(std::string& str);
     void ignore_comments(std::string& str);
     int handle_cdata(std::string& str, long cdata_begin);

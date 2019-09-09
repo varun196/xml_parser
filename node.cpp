@@ -1,9 +1,7 @@
 #include "node.h"
 #include <boost/algorithm/string/replace.hpp>
 
-// TODO: handle CDATA
 // TODO: close file  myfile.close();
-// TODO: handle exceptions
 // TODO: Send callbacks on separate thread
 
 Node::Node(callback_type callback, std::string path): 
@@ -12,15 +10,18 @@ _path(path),
 _reader(FileReader::get_instance().get_reader())
 {}
 
-std::string Node::get_next_line(){
-    std::string line;
-    if(_reader.peek() == std::ifstream::traits_type::eof()){
-        throw "unexpected eof -- Invalid xml?";
+
+std::string& Node::get_value(){
+    return _text_value;
+}
+
+std::string& Node::get_attribute(std::string key){
+    auto itr = _attributes.find(key);
+    if(itr != _attributes.end()){
+        return itr->second;
+    }else{
+        throw "Error: No such key: key " + key +" node name: "+_name + " path:"+ _path;
     }
-    std::getline(_reader, line);
-    remove_initial_whitespaces(line);
-    ignore_comments(line);
-    return line;
 }
 
 void Node::begin_parsing(){
@@ -29,6 +30,29 @@ void Node::begin_parsing(){
         begin_parsing(line);   
     }else{
         throw "File not open";
+    }
+}
+
+void Node::begin_parsing(std::string& node){
+    remove_initial_whitespaces(node);
+    std::size_t tag_end = extract_properties(node);
+    if(_search_for_closing_tag){
+        _s_xml_stack.push(_name);
+        parse_value(node, tag_end+1);
+        std::string line;
+        while(!_tag_complete){
+            line = get_next_line();
+            parse_end_tag(line);
+            if(!_tag_complete){
+                if(line[0] == '<' && line[1] != '!'){ // if this is a tag
+                    std::shared_ptr<Node> ip_node= std::make_shared<Node>(_callback, _path);
+                    ip_node->begin_parsing(line);
+                    _child_nodes.emplace_back(ip_node);
+                }else{
+                    parse_value(line,0);
+                }
+            }
+        }
     }
 }
 
@@ -84,52 +108,6 @@ void Node::parse_value(std::string& str, std::size_t start_from){
     
     return ;  // TODO: return if two tags in same lines are handled
 
-}
-
-int Node::handle_cdata(std::string& str, long cdata_begin){
-    // Verify this is cdata
-    if(str.substr(cdata_begin, _cdata_beg_str.length()) != _cdata_beg_str) return -1;
-
-    std::size_t end_cdata =str.find(_cdata_end_str);
-    while(end_cdata == str.npos){
-        _text_value.append(str.substr(cdata_begin +_cdata_beg_str.length()));
-        str = get_next_line();
-        cdata_begin = -1 * _cdata_beg_str.length();
-        end_cdata =str.find(_cdata_end_str);
-    }
-    _text_value.append(str.substr(cdata_begin +_cdata_beg_str.length(), end_cdata - cdata_begin - _cdata_beg_str.length()));
-    return end_cdata + _cdata_end_str.length();
-}
-
-void Node::begin_parsing(std::string& node){
-    remove_initial_whitespaces(node);
-    std::size_t tag_end = extract_properties(node);
-    if(_search_for_closing_tag){
-        _s_xml_stack.push(_name);
-        parse_value(node, tag_end+1);
-        std::string line;
-        while(!_tag_complete){
-            line = get_next_line();
-            parse_end_tag(line);
-            if(!_tag_complete){
-                if(line[0] == '<' && line[1] != '!'){ // if this is a tag
-                    std::shared_ptr<Node> ip_node= std::make_shared<Node>(_callback, _path);
-                    ip_node->begin_parsing(line);
-                    _child_nodes.emplace_back(ip_node);
-                }else{
-                    parse_value(line,0);
-                }
-            }
-        }
-    }
-}
-
-void Node::ignore_comments(std::string& str){
-    std::size_t comm_beg = str.find("<!--");
-    if(comm_beg == str.npos)    return;
-    std::size_t comm_end = str.find("-->", comm_beg) + 3;
-    str.erase(comm_beg, comm_end-comm_beg);
-    ignore_comments(str);
 }
 
 int Node::extract_properties(std::string& str){
@@ -233,9 +211,42 @@ void Node::replace_xml_escapes(std::string& val){
     boost::replace_all(val,"&amp;","&");
 };
 
+std::string Node::get_next_line(){
+    std::string line;
+    if(_reader.peek() == std::ifstream::traits_type::eof()){
+        throw "unexpected eof -- Invalid xml?";
+    }
+    std::getline(_reader, line);
+    remove_initial_whitespaces(line);
+    ignore_comments(line);
+    return line;
+}
 
 void Node::remove_initial_whitespaces(std::string& str){
     int i=0;
     while(i < str.length() && isspace(str[i])) i++;
     str = str.substr(i);
+}
+
+void Node::ignore_comments(std::string& str){
+    std::size_t comm_beg = str.find("<!--");
+    if(comm_beg == str.npos)    return;
+    std::size_t comm_end = str.find("-->", comm_beg) + 3;
+    str.erase(comm_beg, comm_end-comm_beg);
+    ignore_comments(str);
+}
+
+int Node::handle_cdata(std::string& str, long cdata_begin){
+    // Verify this is cdata
+    if(str.substr(cdata_begin, _cdata_beg_str.length()) != _cdata_beg_str) return -1;
+
+    std::size_t end_cdata =str.find(_cdata_end_str);
+    while(end_cdata == str.npos){
+        _text_value.append(str.substr(cdata_begin +_cdata_beg_str.length()));
+        str = get_next_line();
+        cdata_begin = -1 * _cdata_beg_str.length();
+        end_cdata =str.find(_cdata_end_str);
+    }
+    _text_value.append(str.substr(cdata_begin +_cdata_beg_str.length(), end_cdata - cdata_begin - _cdata_beg_str.length()));
+    return end_cdata + _cdata_end_str.length();
 }
