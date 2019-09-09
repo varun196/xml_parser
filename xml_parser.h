@@ -1,7 +1,5 @@
 #include<bits/stdc++.h>
 
-// TODO: hold filereader
-
 class XMLParser{
     using callback_type = std::function<void(std::string path, std::string name, std::shared_ptr<Node> node)>;
 

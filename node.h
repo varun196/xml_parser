@@ -19,7 +19,7 @@ public:
 
 private:
     std::ifstream& _reader;
-    static std::stack<std::string> _s_xml_stack;
+    static std::stack<std::string> _s_xml_stack; // used to validate XML tag ordering
 
     std::string _name; // Node's name
     std::string _path; // Current path
@@ -49,7 +49,7 @@ private:
 
     void parse_value(std::string& str, std::size_t start_from);
 
-    inline std::string get_next_line();
+    inline std::string get_next_line(); // Retrives next line from XML file
     inline void remove_initial_whitespaces(std::string& str);
     void ignore_comments(std::string& str);
     int handle_cdata(std::string& str, long cdata_begin);

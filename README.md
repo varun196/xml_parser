@@ -3,6 +3,19 @@
 A forward XML parser that parses xml.  
 Executes callbacks indicating values at each node.   
 
+Handles:
+
+1. XML comments
+2. CDATA sections
+3. XML escapes:  
+```
+    &quot;    
+    &apos;
+    &lt;
+    &gt;
+    &amp;
+```
+
 ## Running demo
 
 Execute below line in terminal in the directory where the repo is cloned.  
@@ -65,3 +78,23 @@ Note that smart pointers are returned, so if callback does not save root level n
     callback_type _callback = NULL;
 ```
 
+### Running tests
+
+To run test on standard.xml, execute:  
+```
+   g++ tests.cpp -o test && ./test > res.txt
+```
+
+Please note that some of the tests are mutually exclusive.
+
+### Current limitations
+
+- Spaces at start of XML are ignored, which may be an issue if they are part of value.  
+- Does not handle beginning of non-nested tag on same line.  
+- Expects special XML tags like `<?xml ...?>` on its own line
+
+### Future improvements
+
+- [ ] Improve space handling  
+- [ ] Send callbacks on separate thread
+- [ ] Have `xml_parser` manage `file_reader` instances and make the latter non-singleton
