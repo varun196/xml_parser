@@ -28,6 +28,7 @@ private:
     bool _search_for_closing_tag = true;
     bool _tag_complete = false;
 
+    std::size_t _end_tag_end_pos;
     callback_type _callback = NULL;
         
     const std::string _cdata_beg_str = "<![CDATA[";

@@ -1,10 +1,10 @@
-#include "xml_parser_impli.h"
+// #include "xml_parser_impli.h"
 
-int main(){
+// int main(){
 
-// initialize file to 
+// // initialize file to 
 
-    XMLParser parser("test.xml");
-    parser.beginParsing();
-    return 0;
-}
+//     XMLParser parser("test.xml");
+//     parser.beginParsing();
+//     return 0;
+// }

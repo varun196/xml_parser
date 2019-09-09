@@ -18,5 +18,7 @@ void XMLParser::beginParsing(){
         std::cout<<e.what();
     }catch(const std::string& e){
         std::cout<<e;
+    }catch(const char* e){
+        std::cout<<e;
     }
 }

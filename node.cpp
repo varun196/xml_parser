@@ -63,12 +63,23 @@ void Node::parse_value(std::string& str, std::size_t start_from){
 
     // if this is end tag
     if(next_tag_start+1 < str.length() && str[next_tag_start+1] == '/'){
-        _text_value = str.substr(start_from, next_tag_start - start_from);
+        _text_value.append(str.substr(start_from, next_tag_start - start_from));
         parse_end_tag(str, next_tag_start);
     }else if(next_tag_start+1 < str.length() && str[next_tag_start+1] == '!'){
         handle_cdata(str, next_tag_start);
     }else{
-        //throw "Next tag starting in same line is not handled ";
+        // Handle new tag in same line
+        if(next_tag_start < str.length() && str[next_tag_start] == '<'){
+            _text_value.append(str.substr(start_from, next_tag_start-start_from));
+            std::shared_ptr<Node> ip_node= std::make_shared<Node>(_callback, _path);
+            std::string line = str.substr(next_tag_start);
+            ip_node->begin_parsing(line);
+            _child_nodes.emplace_back(ip_node);
+            if(ip_node->_end_tag_end_pos != line.length()-1){
+                str = line.substr(ip_node->_end_tag_end_pos+1);
+                parse_value(str,0 );
+            }
+        }
     }
     
     return ;  // TODO: return if two tags in same lines are handled
@@ -186,13 +197,14 @@ bool Node::parse_end_tag(const std::string& str, std::size_t tag_begin /*=0*/){
                 if(tag_name == _s_xml_stack.top()){
                     if(_s_xml_stack.top() == _name){
                         _tag_complete = true;
+                        _end_tag_end_pos = tag_end;
                     }   
                     _s_xml_stack.pop();
                     if(_callback != NULL){
                         _callback(_path,_name,shared_from_this());
                     }
                 }else{
-                    throw "Invalid XML";
+                    throw "Invalid XML: tag_name" + tag_name +" stack_top:" + _s_xml_stack.top();
                 }
             }else{
                 throw "Invalid XML";

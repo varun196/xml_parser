@@ -1,9 +1,15 @@
 <?xml version="1.0" standalone="yes"?>
 <empty_tag></empty_tag>
 <text> this is a plain text </text>
-<text> 
-    this is a plain text 
-</text>
+<text_new_line> 
+    this is a plain text in new line
+</text_new_line>
+<two_tag> 
+    <emph> this is an emphasized <bold> and bold text </bold> </emph>
+</two_tag>
+<three_tag> 
+    <1>a<2>b<3>c</3></2></1>
+</three_tag>
 <text> 
     this is two lined plain text
     this is second line
