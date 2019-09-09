@@ -15,6 +15,17 @@ public:
     std::string& get_value(){
         return _text_value;
     }
+
+    std::string& get_attribute(std::string key){
+        auto itr = _attributes.find(key);
+        if(itr != _attributes.end()){
+            return itr->second;
+        }else{
+            throw "Error: No such key: key " + key +" node name: "+_name + " path:"+ _path;
+        }
+    }
+
+
 private:
     std::ifstream& _reader;
     static std::stack<std::string> _s_xml_stack;

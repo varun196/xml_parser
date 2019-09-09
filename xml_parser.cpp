@@ -1,6 +1,8 @@
 #include "node.cpp"
 #include "xml_parser.h"
 
+std::stack<std::string> Node::_s_xml_stack;
+
 XMLParser::XMLParser(std::string input_file, callback_type callback):
     _fileReaderReference(FileReader::get_instance(input_file)),
     _callback(callback),

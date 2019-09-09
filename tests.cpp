@@ -1,7 +1,6 @@
 #include "xml_parser.cpp"
 #include <gtest/gtest.h>
 
-std::stack<std::string> Node::_s_xml_stack;
 
 void TestNodeViaXML(){
     FileReader::get_instance("test.xml");
