@@ -30,8 +30,8 @@ void CallbackTest(){
 }
 
 void XMLParserTest(){
-    //XMLParser parser("standard.xml", foo);
-    XMLParser parser("test.xml", foo);
+    XMLParser parser("standard.xml", foo);
+    //XMLParser parser("test.xml", foo);
     parser.beginParsing();
 }
 

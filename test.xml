@@ -1,5 +1,6 @@
 <?xml version="1.0" standalone="yes"?>
 <empty_tag></empty_tag>
+<single_tag_with_attrib id="singleid" />
 <text> this is a plain text </text>
 <text_new_line> 
     this is a plain text in new line
@@ -43,9 +44,9 @@
 </comment_test>
 <cdata_test>
     <![CDATA[
-        This
-        is
+        This 
+        is 
         a 
-        multiline <cdata>
+        multiline <cdata> 
     ]]>]
 </cdata_test>

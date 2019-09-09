@@ -43,16 +43,16 @@ void Node::parse_value(std::string& str, std::size_t start_from){
     
     // Find start of end tag or cdata or newtag
     while(next_tag_start < str.length() && str[next_tag_start] != '<'){
-        if(str[next_tag_start] == '"' || str[next_tag_start] == '\'' ){ 
-            // Skip "" or ''
-            next_tag_start = str.find(str[next_tag_start], next_tag_start+1);
-            if(next_tag_start == str.npos){ // if ending " or ' not in current line 
-                _text_value.append(str.substr(start_from));
-                str = get_next_line();
-                next_tag_start = start_from = 0;
-                continue;
-            }
-        }
+        // if(str[next_tag_start] == '"' || str[next_tag_start] == '\'' ){ 
+        //     // Skip "" or ''
+        //     next_tag_start = str.find(str[next_tag_start], next_tag_start+1);
+        //     if(next_tag_start == str.npos){ // if ending " or ' not in current line 
+        //         _text_value.append(str.substr(start_from));
+        //         str = get_next_line();
+        //         next_tag_start = start_from = 0;
+        //         continue;
+        //     }
+        // }
         next_tag_start++;
     }
 
@@ -161,6 +161,9 @@ int Node::extract_attributes(std::string& str, int key_start){
     
     if(str[key_start] == '/' &&  str[key_start + 1] == '>'){
         _search_for_closing_tag = false;
+        if(_callback){
+            _callback(_path,_name,shared_from_this());
+        }
         return key_start+1;
     }else if(str[key_start] == '>'){
         return key_start;
@@ -179,6 +182,10 @@ int Node::extract_attributes(std::string& str, int key_start){
     replace_xml_escapes(val);
 
     _attributes.emplace(key, val);
+
+    if(val == "item277"){
+        val = "item277";
+    }
 
     std::size_t next_key_start = val_end+1;
     while(isspace(str[next_key_start]))  next_key_start++;
