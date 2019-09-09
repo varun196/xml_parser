@@ -1,6 +1,6 @@
 # XML Parser
 
-A forward XML parser that parses xml.  
+A forward-only XML parser that parses xml.  
 Executes callbacks indicating values at each node.   
 
 Handles:
@@ -98,3 +98,4 @@ Please note that some of the tests are mutually exclusive.
 - [ ] Improve space handling  
 - [ ] Send callbacks on separate thread
 - [ ] Have `xml_parser` manage `file_reader` instances and make the latter non-singleton
+- [ ] Automate tests via google_test
