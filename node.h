@@ -41,15 +41,15 @@ private:
     int extract_attributes(std::string& str, int i); // Extracts attributes
 
 
-    bool parse_end_tag(const std::string& str, std::size_t pos = 0); // Verifies tag end and checks if xml was valid.
+    bool parse_end_tag(const std::string& str, std::size_t pos = 0); // Verifies tag end and checks if xml was valid. Also calls callbacks.
 
     inline bool is_valid_tag_name_char(const char& c); // Check if char is valid char for tag name
 
     inline void replace_xml_escapes(std::string& str); // Replace escape escapes to original chars
 
-    void parse_value(std::string& str, std::size_t start_from);
+    void parse_value(std::string& str, std::size_t start_from); // Parse value of current node: <p> Hello World </p>
 
-    inline std::string get_next_line(); // Retrives next line from XML file
+    inline std::string get_next_line(); // Retrives next line from XML file and performs initial preprocessing.
     inline void remove_initial_whitespaces(std::string& str);
     void ignore_comments(std::string& str);
     int handle_cdata(std::string& str, long cdata_begin);

@@ -39,10 +39,10 @@ void Node::begin_parsing(std::string& node){
         _s_xml_stack.push(_name);
         parse_value(node, tag_end+1); // Parse value present in current node
         std::string line;
-        while(!_tag_complete){  // Till the current tag is not complete, all the tags within are child tags
+        while(!_tag_complete){      // Till the current tag is not complete, all the tags within are child tags
             line = get_next_line();
-            parse_end_tag(line); // If the next line only contains tag end
-            if(!_tag_complete){
+            parse_end_tag(line);          // If the next line contains tag end, parse it.
+            if(!_tag_complete){           // if end tag is still not found
                 if(line[0] == '<' && line[1] != '!'){ // if this is a child tag, parse it recursively
                     std::shared_ptr<Node> ip_node= std::make_shared<Node>(_callback, _path);
                     ip_node->begin_parsing(line);
@@ -82,13 +82,13 @@ void Node::parse_value(std::string& str, std::size_t start_from){
         // Handle nested tag in same line
         if(next_tag_start < str.length() && str[next_tag_start] == '<'){
             _text_value.append(str.substr(start_from, next_tag_start-start_from));
-            std::shared_ptr<Node> ip_node= std::make_shared<Node>(_callback, _path);
+            std::shared_ptr<Node> ip_node= std::make_shared<Node>(_callback, _path);    // Create nested node
             std::string line = str.substr(next_tag_start);
-            ip_node->begin_parsing(line);
-            _child_nodes.emplace_back(ip_node);
-            if(ip_node->_end_tag_end_pos != line.length()-1){
-                str = line.substr(ip_node->_end_tag_end_pos+1);
-                parse_value(str,0 );
+            ip_node->begin_parsing(line);                           // Ask nested node to start parsing.
+            _child_nodes.emplace_back(ip_node);                     // Save reference to nested node.
+            if(ip_node->_end_tag_end_pos != line.length()-1){       // If child node's end tag is not the line's end: "<b><i>hi</i>there</b>"
+                str = line.substr(ip_node->_end_tag_end_pos+1);     // Then current node has value ("there")
+                parse_value(str,0 );                                // parse that value
             }
         }
     }
@@ -98,7 +98,8 @@ void Node::parse_value(std::string& str, std::size_t start_from){
 }
 
 int Node::extract_properties(std::string& str){
-    // Extracts name and attributes
+    // Extracts name and attributes. Calls callback if tag is empty tag: <abc />
+    // Returns pos of current tag end: '>'
     if(str[0] != '<'){
         throw "Expected tag begin";
     }
@@ -143,7 +144,7 @@ int Node::extract_attributes(std::string& str, int key_start){
     std::size_t val_start = eq_pos+1;
     while(isspace(str[val_start]))  val_start++;
 
-    std::size_t val_end = str.find(str[val_start],val_start+1);
+    std::size_t val_end = str.find(str[val_start],val_start+1);         // Find ' or " depending on how value startes
     std::string val = str.substr(val_start+1,val_end - val_start -1);
     replace_xml_escapes(val);
 
@@ -232,13 +233,13 @@ void Node::ignore_comments(std::string& str){
 int Node::handle_cdata(std::string& str, long cdata_begin){
     // Verify this is cdata
     if(str.substr(cdata_begin, _cdata_beg_str.length()) != _cdata_beg_str) return -1;
-
+    // Parse CDATA
     std::size_t end_cdata =str.find(_cdata_end_str);
     while(end_cdata == str.npos){
         _text_value.append(str.substr(cdata_begin +_cdata_beg_str.length()));
         str = get_next_line();
         cdata_begin = -1 * _cdata_beg_str.length();
-        end_cdata =str.find(_cdata_end_str);
+        end_cdata = str.find(_cdata_end_str);
     }
     _text_value.append(str.substr(cdata_begin +_cdata_beg_str.length(), end_cdata - cdata_begin - _cdata_beg_str.length()));
     return end_cdata + _cdata_end_str.length();
